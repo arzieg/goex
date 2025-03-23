@@ -18,6 +18,8 @@ func main() {
 		fmt.Println("Fahrenheit:", myflags.Fahrenheit)
 		fmt.Println("KG:", myflags.Kg)
 		fmt.Println("Pound:", myflags.Pound)
+		fmt.Println("Meters:", myflags.Meters)
+		fmt.Println("Feet:", myflags.Feet)
 	}
 
 	switch {
