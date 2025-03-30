@@ -9,8 +9,8 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/comma",
-            "args": ["5000"]
+            "program": "${workspaceFolder}/append",
+            //"args": ["5000"]
         }
 
     ]
