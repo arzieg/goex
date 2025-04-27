@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/intset",
+            "program": "${workspaceFolder}/bytecounter",
             //"args": ["5000"]
         }
 
