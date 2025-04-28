@@ -11,11 +11,6 @@ type ByteCounter int
 type WordCounter int
 type LineCounter int
 
-func (c *ByteCounter) Write(p []byte) (int, error) {
-	*c += ByteCounter(len(p))
-	return len(p), nil
-}
-
 func (w *WordCounter) Write(p []byte) (int, error) {
 	scanner := bufio.NewScanner(strings.NewReader(string(p)))
 	count := 0
