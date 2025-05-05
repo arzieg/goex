@@ -1,13 +1,12 @@
 package main
 
 import (
+	"eval"
 	"fmt"
 	"io"
 	"log"
 	"math"
 	"net/http"
-
-	"eval"
 )
 
 //!+parseAndCheck

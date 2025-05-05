@@ -3,59 +3,27 @@ package eval
 import (
 	"fmt"
 	"math"
-	"strings"
 )
 
-// Var is a variable
-type Var string
+//!+env
 
-type literal float64
+type Env map[Var]float64
 
-// A unary represents a unar operator e.g. -x
-type unary struct {
-	op rune // one of + / -
-	x  Expr
-}
+//!-env
 
-// A binary represents a binary operator e.g. x+y
-type binary struct {
-	op   rune // one of +,-,*,/
-	x, y Expr
-}
+//!+Eval1
 
-// A call represents a function call expression, e.g. sin(x)
-type call struct {
-	fn   string // one of pow, sin, sqrt
-	args []Expr
-}
-
-// Env is the environment for the expression
-type Env map[Var]float64 // environment for the expression
-
-// Expr is a expression
-type Expr interface {
-	Eval(env Env) float64
-	Check(vars map[Var]bool) error
-}
-
-// Eval the variable
 func (v Var) Eval(env Env) float64 {
 	return env[v]
-}
-
-// Check  var
-func (v Var) Check(vars map[Var]bool) error {
-	vars[v] = true
-	return nil
 }
 
 func (l literal) Eval(_ Env) float64 {
 	return float64(l)
 }
 
-func (literal) Check(vars map[Var]bool) error {
-	return nil
-}
+//!-Eval1
+
+//!+Eval2
 
 func (u unary) Eval(env Env) float64 {
 	switch u.op {
@@ -65,13 +33,6 @@ func (u unary) Eval(env Env) float64 {
 		return -u.x.Eval(env)
 	}
 	panic(fmt.Sprintf("unsupported unary operator: %q", u.op))
-}
-
-func (u unary) Check(vars map[Var]bool) error {
-	if !strings.ContainsRune("+-", u.op) {
-		return fmt.Errorf("unexpected unary op %q", u.op)
-	}
-	return u.x.Check(vars)
 }
 
 func (b binary) Eval(env Env) float64 {
@@ -84,19 +45,8 @@ func (b binary) Eval(env Env) float64 {
 		return b.x.Eval(env) * b.y.Eval(env)
 	case '/':
 		return b.x.Eval(env) / b.y.Eval(env)
-
 	}
 	panic(fmt.Sprintf("unsupported binary operator: %q", b.op))
-}
-
-func (b binary) Check(vars map[Var]bool) error {
-	if !strings.ContainsRune("+-*/", b.op) {
-		return fmt.Errorf("unexprected binary op %q", b.op)
-	}
-	if err := b.x.Check(vars); err != nil {
-		return err
-	}
-	return b.y.Check(vars)
 }
 
 func (c call) Eval(env Env) float64 {
@@ -110,22 +60,3 @@ func (c call) Eval(env Env) float64 {
 	}
 	panic(fmt.Sprintf("unsupported function call: %s", c.fn))
 }
-
-func (c call) Check(vars map[Var]bool) error {
-	arity, ok := numParams[c.fn]
-	if !ok {
-		return fmt.Errorf("unknown function %q", c.fn)
-	}
-	if len(c.args) != arity {
-		return fmt.Errorf("call to %s has %d args, want %d",
-			c.fn, len(c.args), arity)
-	}
-	for _, arg := range c.args {
-		if err := arg.Check(vars); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-var numParams = map[string]int{"pow": 2, "sin": 1, "sqrt": 1}
