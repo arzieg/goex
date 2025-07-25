@@ -14,7 +14,15 @@ const (
 
 func main() {
 
+	logFile, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+
+	defer logFile.Close()
+
 	opts := &slog.HandlerOptions{
+		Level: slog.LevelDebug,
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
 			if a.Key == slog.LevelKey {
 				level := a.Value.Any().(slog.Level)
@@ -27,11 +35,9 @@ func main() {
 			}
 			return a
 		},
+		AddSource: true,
 	}
-	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level:       slog.LevelDebug,
-		ReplaceAttr: opts.ReplaceAttr,
-	})
+	handler := slog.NewJSONHandler(logFile, opts)
 	logger := slog.New(handler)
 
 	logger.Log(context.Background(), slog.LevelInfo, "an info message")
